@@ -1,8 +1,11 @@
 package com.github.flanaras.qrcamerareader.Interfaces;
 
+import java.awt.image.BufferedImage;
+
 /**
- * Created by Philip Lanaras on 09/05/17.
+ * @author flanaras
  */
 public interface OnQREvent {
-    void QRRead(String QRText);
+    void QRText(String QRText);
+    void QRImage(BufferedImage image);
 }

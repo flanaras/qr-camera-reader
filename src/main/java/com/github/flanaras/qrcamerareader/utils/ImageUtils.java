@@ -17,7 +17,7 @@ public class ImageUtils {
     //adapted from http://stackoverflow.com/questions/11487251/best-way-to-access-web-camera-in-java
     public static boolean saveImage(BufferedImage image, String path) {
         try {
-            ImageIO.write(image, "PNG", new File(path));
+            ImageIO.write(image, com.github.sarxos.webcam.util.ImageUtils.FORMAT_PNG, new File(path));
             return true;
         } catch (IOException e) {
             e.printStackTrace();

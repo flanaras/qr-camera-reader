@@ -12,27 +12,33 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author flanaras
  */
-public class WebCamOperations {
+public class WebCamOperations implements Runnable {
 
-    private List<OnQREvent> onQREventList = null;
+    private List<OnQREvent> onQREvents = null;
+
+    private String previousQR = null;
 
     private Webcam webcam;
+    private boolean executeRun = false;
 
     public WebCamOperations() {
         Webcam.setDriver(new V4l4jDriver());
-        onQREventList = new ArrayList<>();
+        onQREvents = new ArrayList<>();
 
         webcam = Webcam.getWebcams().get(0);
         set720pResolution();
         webcam.open();
+
+        executeRun = true;
     }
 
     public void addOnQREventListener(OnQREvent onQREvent) {
-        onQREventList.add(onQREvent);
+        onQREvents.add(onQREvent);
     }
 
     private void set720pResolution() {
@@ -48,7 +54,6 @@ public class WebCamOperations {
         webcam.setViewSize(dimension);
     }
 
-
     public BufferedImage takePicture() {
         if (webcam.isOpen()) {
             return webcam.getImage();
@@ -57,16 +62,21 @@ public class WebCamOperations {
         return null;
     }
 
-    public void execute() {
+    public Webcam getWebcam() {
+        return webcam;
+    }
 
-        BufferedImage image;
-        while (true) {
+    @Override
+    public void run() {
+
+        while (executeRun) {
             ThreadUtils.sleep(200);
 
             if (webcam.isOpen()) {
 
-                image = webcam.getImage();
+                final BufferedImage image = webcam.getImage();
                 if (hasNoImage(image)) {
+                    System.err.println("Not image");
                     continue;
                 }
 
@@ -75,11 +85,19 @@ public class WebCamOperations {
                 final Result result = ImageUtils.recogniseQR(bitmap);
 
                 if (hasResult(result)) {
-                    ImageUtils.saveImage(image, "test.png");
+                    if (!result.getText().equals(previousQR)) {
 
-                    onQREventList.forEach(onQREvent -> onQREvent.QRRead(result.getText()));
-                    break;
+
+                        ImageUtils.saveImage(image, "QR_" + System.currentTimeMillis() + ".png");
+
+                        onQREvents.forEach(onQREvent -> onQREvent.QRText(result.getText()));
+                        onQREvents.forEach(onQREvent -> onQREvent.QRImage(image));
+
+                        previousQR = result.getText();
+                    }
                 }
+            } else {
+                System.err.println("closed web camera");
             }
         }
     }
