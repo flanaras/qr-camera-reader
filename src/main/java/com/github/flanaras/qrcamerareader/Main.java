@@ -34,8 +34,8 @@ public class Main {
         String host = "http://192.168.42.129";
         int port = 12345;
         String path = "/video";
-        WebCamOperations webCamOp = new IPWebCamOperations(host, port, path);
-        //WebCamOperations webCamOp = new PCWebCamOperations();
+        //WebCamOperations webCamOp = new IPWebCamOperations(host, port, path);
+        WebCamOperations webCamOp = new PCWebCamOperations();
 
         webCamOp.addOnQREventListener(new MyEvent());
 

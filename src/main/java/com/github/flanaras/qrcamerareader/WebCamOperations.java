@@ -69,7 +69,7 @@ public class WebCamOperations implements Runnable {
     @Override
     public void run() {
 
-        if (webcam != null) {
+        if (hasWebcam()) {
             while (executeRun) {
                 ThreadUtils.sleep(200);
 
@@ -104,6 +104,10 @@ public class WebCamOperations implements Runnable {
         } else {
             System.err.println("Camera is null");
         }
+    }
+
+    private boolean hasWebcam() {
+        return webcam != null;
     }
 
     private boolean hasResult(Result result) {
